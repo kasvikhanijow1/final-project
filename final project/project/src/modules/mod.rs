@@ -36,3 +36,44 @@ pub fn read_csv(file_path: &str) -> Result<(Vec<f64>, Vec<f64>), Box<dyn Error>>
     Ok((days, total_streams))
 }
 
+//i normalized the data to have mean = 0 and std = 1.
+pub fn normalize(data: &Vec<f64>) -> (Vec<f64>, f64, f64) {
+    let mean = data.iter().sum::<f64>() / data.len() as f64;
+    let std = (data.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64).sqrt();
+
+    let normalized_data = if std > 0.0 {
+        data.iter().map(|&x| (x - mean) / std).collect()
+    } else {
+        data.clone()
+    };
+    (normalized_data, mean, std)
+}
+
+//this runs the linear regression using gradient descent
+pub fn linear_regression(
+    x: &Vec<f64>,
+    y: &Vec<f64>,
+    learning_rate: f64,
+    iterations: usize,
+) -> (f64, f64) {
+    let mut slope = 0.0; // m
+    let mut intercept = 0.0; // b
+    let n = x.len() as f64;
+
+    for _ in 0..iterations {
+        let mut slope_gradient = 0.0;
+        let mut intercept_gradient = 0.0;
+
+        for (xi, yi) in x.iter().zip(y.iter()) {
+            let prediction = slope * xi + intercept;
+            slope_gradient += -2.0 * xi * (yi - prediction);
+            intercept_gradient += -2.0 * (yi - prediction);
+        }
+
+        slope -= learning_rate * (slope_gradient / n);
+        intercept -= learning_rate * (intercept_gradient / n);
+    }
+
+    (slope, intercept)
+}
+

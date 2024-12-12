@@ -39,4 +39,17 @@ fn main() {
     println!("Intercept (b): {:.4}", intercept);
     println!("Equation: y = {:.4}x + {:.4}", slope, intercept);
     println!("Coefficient of Determination (R^2): {:.4}", r2);
+}
+
+mod tests {
+    use super::*;
+    #[test]
+    fn test_normalize() {
+        let data = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        let (normalized, mean, std) = normalize(&data);
+        assert_eq!(mean, 3.0, "Mean should be 3.0.");
+        assert!((std - (2.0f64).sqrt()).abs() < 1e-6, "Std should be sqrt(2).");
+        assert_eq!(normalized.len(), data.len(), "Normalized data length should match original.");
+    }
+
 
