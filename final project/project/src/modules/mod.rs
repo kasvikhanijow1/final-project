@@ -2,7 +2,9 @@ use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+
 //this code reads the CSV file and extracts data for days (x) and total streams (y).
+
 pub fn read_csv(file_path: &str) -> Result<(Vec<f64>, Vec<f64>), Box<dyn Error>> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
@@ -37,6 +39,7 @@ pub fn read_csv(file_path: &str) -> Result<(Vec<f64>, Vec<f64>), Box<dyn Error>>
 }
 
 //i normalized the data to have mean = 0 and std = 1.
+
 pub fn normalize(data: &Vec<f64>) -> (Vec<f64>, f64, f64) {
     let mean = data.iter().sum::<f64>() / data.len() as f64;
     let std = (data.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64).sqrt();
@@ -50,6 +53,7 @@ pub fn normalize(data: &Vec<f64>) -> (Vec<f64>, f64, f64) {
 }
 
 //this runs the linear regression using gradient descent
+
 pub fn linear_regression(
     x: &Vec<f64>,
     y: &Vec<f64>,
@@ -77,3 +81,28 @@ pub fn linear_regression(
     (slope, intercept)
 }
 
+//i calculated the coefficient of determination
+
+pub fn coefficient_of_determination(
+    x: &Vec<f64>,
+    y: &Vec<f64>,
+    slope: f64,
+    intercept: f64,
+) -> f64 {
+    let y_mean = y.iter().sum::<f64>() / y.len() as f64;
+
+    let ss_total: f64 = y.iter().map(|&yi| (yi - y_mean).powi(2)).sum();
+    let ss_residual: f64 = x
+        .iter()
+        .zip(y.iter())
+        .map(|(&xi, &yi)| (yi - (slope * xi + intercept)).powi(2))
+        .sum();
+
+    if ss_total > 0.0 {
+        1.0 - (ss_residual / ss_total)
+    } else {
+        1.0
+  
+    }
+
+}

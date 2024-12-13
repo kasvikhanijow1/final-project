@@ -8,6 +8,7 @@ use modules::coefficient_of_determination;
 
 //i used the main function for it to reads the data, normalizes it, performs linear regression, evaluates the model with R², 
 //and prints the results according to the data set
+
 fn main() {
     let file_path = "Spotify_final_dataset.csv";
 
@@ -52,4 +53,22 @@ mod tests {
         assert_eq!(normalized.len(), data.len(), "Normalized data length should match original.");
     }
 
+    #[test]
+    fn test_linear_regression() {
+        let x = vec![1.0, 2.0, 3.0, 4.0];
+        let y = vec![2.0, 4.0, 6.0, 8.0]; 
+        let (slope, intercept) = linear_regression(&x, &y, 0.01, 10_000);
+        assert!((slope - 2.0).abs() < 0.001, "Slope should be close to 2.0.");
+        assert!(intercept.abs() < 0.001, "Intercept should be close to 0.0.");
+    }
+
+    #[test]
+    fn test_coefficient_of_determination() {
+        let x = vec![1.0, 2.0, 3.0, 4.0];
+        let y = vec![2.0, 4.0, 6.0, 8.0];
+        let (slope, intercept) = linear_regression(&x, &y, 0.01, 10_000);
+        let r2 = coefficient_of_determination(&x, &y, slope, intercept);
+        assert!((r2 - 1.0).abs() < 0.001, "R^2 should be close to 1.0 for a perfect fit.");
+    }
+}
 
